@@ -34,6 +34,7 @@ public:
 	inline bool DisableTriggerTouch() { return disableTriggerTouch; }
 	float HapticStrength() { return hapticStrength; }
 	inline bool DisableTrackPad() { return disableTrackPad; }
+	std::string KeyboardText() { return keyboardText; }
 
 private:
 	static int ini_handler(
@@ -74,6 +75,7 @@ private:
 	bool disableTriggerTouch = false;
 	float hapticStrength = 0.1f;
 	bool disableTrackPad = false;
+	std::string keyboardText = "Adventurer";
 };
 
 extern Config oovr_global_configuration;

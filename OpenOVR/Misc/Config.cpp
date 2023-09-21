@@ -136,7 +136,10 @@ static int parse_int(string orig, string name, int line)
 
 static string parse_string(string orig, string name, int line)
 {
-	string result = str_tolower(orig);
+	string result = orig;
+	if (name != "keyboardText") {
+		result = str_tolower(orig);
+	}
 
 	OOVR_LOGF("Setting config param %s to %s", name.c_str(), result.c_str());
 	return result;
@@ -189,6 +192,7 @@ int Config::ini_handler(void* user, const char* pSection,
 		CFGOPT(bool, disableTriggerTouch);
 		CFGOPT(float, hapticStrength);
 		CFGOPT(bool, disableTrackPad);
+		CFGOPT(string, keyboardText);
 	}
 
 #undef CFGOPT
