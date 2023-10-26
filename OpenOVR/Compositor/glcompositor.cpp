@@ -236,6 +236,8 @@ GLuint GLBaseCompositor::NormaliseFormat(GLuint format)
 	switch (format) {
 	case GL_RGBA:
 		return GL_RGBA8;
+	case GL_RGBA8:
+		return 35907;
 	default:
 		return format;
 	}
