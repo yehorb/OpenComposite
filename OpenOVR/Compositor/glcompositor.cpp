@@ -80,11 +80,13 @@ void GLBaseCompositor::Invoke(const vr::Texture_t* texture, const vr::VRTextureB
 	auto src = (GLuint)(intptr_t)texture->handle;
 
 	// Calculate how large the area to copy is
-	GLsizei inputWidth, inputHeight;
+	GLsizei inputWidth, inputHeight, rawFormat;
 	glBindTexture(GL_TEXTURE_2D, src); // Sadly even GLES3.2 doesn't have glGetTextureLevelParameteriv which takes the image directly
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &inputWidth);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &inputHeight);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &rawFormat);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 	XrRect2Di viewport;
 	if (bounds) {
 		vr::VRTextureBounds_t newBounds = *bounds;
@@ -111,7 +113,7 @@ void GLBaseCompositor::Invoke(const vr::Texture_t* texture, const vr::VRTextureB
 		// submitVerticallyFlipped = false;
 	}
 
-	CheckCreateSwapChain(viewport.extent.width, viewport.extent.height, texture);
+	CheckCreateSwapChain(viewport.extent.width, viewport.extent.height, texture->eColorSpace, rawFormat);
 
 	// First reserve an image from the swapchain
 	XrSwapchainImageAcquireInfo acquireInfo{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
@@ -179,10 +181,10 @@ void GLBaseCompositor::InvokeCubemap(const vr::Texture_t* textures)
 	OOVR_ABORT("GLCompositor::InvokeCubemap: Not yet supported!");
 }
 
-void GLBaseCompositor::CheckCreateSwapChain(int width, int height, const vr::Texture_t* texture)
+void GLBaseCompositor::CheckCreateSwapChain(int width, int height, vr::EColorSpace c_space, GLsizei rawformat)
 {
 	// See the comment for NormaliseFormat as to why we're doing this
-	GLuint format = NormaliseFormat(texture);
+	GLuint format = NormaliseFormat(c_space, rawformat);
 
 	// Build out the info describing the swapchain we need
 	XrSwapchainCreateInfo desc = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
@@ -230,18 +232,13 @@ void GLBaseCompositor::CheckCreateSwapChain(int width, int height, const vr::Tex
 	ReadSwapchainImages();
 }
 
-GLuint GLBaseCompositor::NormaliseFormat(const vr::Texture_t* texture)
+GLuint GLBaseCompositor::NormaliseFormat(vr::EColorSpace c_space, GLsizei rawFormat)
 {
-	GLsizei rawFormat;
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &rawFormat);
-
-	vr::EColorSpace col_space = texture->eColorSpace;
-
 	switch (rawFormat) {
 	case GL_RGBA:
 		return GL_RGBA8;
 	case GL_RGBA8:
-		if (col_space == vr::ColorSpace_Gamma)
+		if (c_space == vr::ColorSpace_Gamma) {
 			// This is a special case where the texture is using a linear color space
 			// format but contains gamma-correction data from the non-linear sRGB color space.
 			// If we dont specify an sRGB color space in the swapchain, the color data will be
@@ -249,8 +246,9 @@ GLuint GLBaseCompositor::NormaliseFormat(const vr::Texture_t* texture)
 			// gamma will be too bright.  Returning a compatible sRGB format type sets up the
 			// proper conditions downstream for proper color handling
 			return 35907; // GL_SRGB8_ALPHA8 (0x8C43)
-		else
-			return GL_RGBA8;
+		} else {
+			return rawFormat; // GL_RGBA8
+		}
 	default:
 		return rawFormat;
 	}
