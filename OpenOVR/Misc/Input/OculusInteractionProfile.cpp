@@ -90,48 +90,52 @@ OculusTouchInteractionProfile::OculusTouchInteractionProfile()
 
 	// Made from values in: SteamVR\resources\rendermodels\oculus_quest2_controller_left\oculus_quest2_controller_left.json
 	glm::mat4 inverseHandTransformLeft = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000 },
-		{ 0.00000, 0.99614, -0.08780, 0.00000 },
-		{ 0.00000, 0.08780, 0.99614, 0.00000 },
-		{ 0.00000, 0.00300, 0.09700, 1.00000 }
+		{ 1.00000, -0.00000, 0.00000, 0.00000, },
+		{ 0.00000, 0.99614, -0.08780, 0.00000, },
+		{ 0.00000, 0.08780, 0.99614, 0.00000, },
+		{ 0.00000, 0.00300, 0.09700, 1.00000, }
 	};
 
 	// Made from values in: SteamVR\resources\rendermodels\oculus_quest2_controller_right\oculus_quest2_controller_right.json
 	glm::mat4 inverseHandTransformRight = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000 },
-		{ 0.00000, 0.99614, -0.08780, 0.00000 },
-		{ 0.00000, 0.08780, 0.99614, 0.00000 },
-		{ 0.00000, 0.00300, 0.09700, 1.00000 }
+		{ 1.00000, -0.00000, 0.00000, 0.00000, },
+		{ 0.00000, 0.99614, -0.08780, 0.00000, },
+		{ 0.00000, 0.08780, 0.99614, 0.00000, },
+		{ 0.00000, 0.00300, 0.09700, 1.00000, }
 	};
 
 	leftHandGripTransform = glm::affineInverse(inverseHandTransformLeft);
 	rightHandGripTransform = glm::affineInverse(inverseHandTransformRight);
 
-	// Set up the component transforms
-	leftComponentTransforms["base"] = {
-		{ -1.00000, 0.00000, -0.00000, 0.00000 },
-		{ 0.00000, 0.99998, -0.00698, 0.00000 },
-		{ 0.00000, -0.00698, -0.99998, 0.00000 },
-		{ -0.00340, -0.00340, 0.14910, 1.00000 }
+	glm::mat4 bodyLeft = {
+		{ 1.00000, -0.00000, 0.00000, 0.00000, },
+		{ 0.00000, 0.99614, -0.08780, 0.00000, },
+		{ 0.00000, 0.08780, 0.99614, 0.00000, },
+		{ 0.00000, 0.00300, 0.09700, 1.00000, }
 	};
-	rightComponentTransforms["base"] = {
-		{ -1.00000, 0.00000, -0.00000, 0.00000 },
-		{ 0.00000, 0.99998, -0.00698, 0.00000 },
-		{ 0.00000, -0.00698, -0.99998, 0.00000 },
-		{ 0.00340, -0.00340, 0.14910, 1.00000 }
+	glm::mat4 bodyRight = {
+		{ 1.00000, -0.00000, 0.00000, 0.00000, },
+		{ 0.00000, 0.99614, -0.08780, 0.00000, },
+		{ 0.00000, 0.08780, 0.99614, 0.00000, },
+		{ 0.00000, 0.00300, 0.09700, 1.00000, }
 	};
-	leftComponentTransforms["tip"] = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000 },
-		{ 0.00000, 0.79441, 0.60738, 0.00000 },
-		{ -0.00000, -0.60738, 0.79441, 0.00000 },
-		{ 0.01669, -0.02522, 0.02469, 1.00000 }
+	glm::mat4 tipLeft = {
+		 { 1.00000, -0.00000, 0.00000, 0.00000, },
+		{ 0.00000, 0.79441, 0.60738, 0.00000, },
+		{ -0.00000, -0.60738, 0.79441, 0.00000, },
+		{ 0.01669, -0.02522, 0.02469, 1.00000, }
 	};
-	rightComponentTransforms["tip"] = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000 },
-		{ 0.00000, 0.79441, 0.60738, 0.00000 },
-		{ -0.00000, -0.60738, 0.79441, 0.00000 },
-		{ -0.01669, -0.02522, 0.02469, 1.00000 }
+	glm::mat4 tipRight = {
+		 { 1.00000, -0.00000, 0.00000, 0.00000, },
+		{ 0.00000, 0.79441, 0.60738, 0.00000, },
+		{ -0.00000, -0.60738, 0.79441, 0.00000, },
+		{ -0.01669, -0.02522, 0.02469, 1.00000, }
 	};
+
+	leftComponentTransforms["body"] = glm::affineInverse(bodyLeft);
+	rightComponentTransforms["body"] = glm::affineInverse(bodyRight);
+	leftComponentTransforms["tip"] = glm::affineInverse(tipLeft);
+	rightComponentTransforms["tip"] = glm::affineInverse(tipRight);
 }
 
 const std::string& OculusTouchInteractionProfile::GetPath() const
