@@ -76,7 +76,6 @@ public:
 	XrExt(XrGraphicsApiSupportedFlags apis, const std::vector<const char*>& extensions);
 
 	bool G2Controller_Available() { return supportsG2Controller; }
-	bool PicoController_Available() { return supportsPicoController; }
 	bool xrGetVisibilityMaskKHR_Available() { return pfnXrGetVisibilityMaskKHR != nullptr; }
 	XrResult xrGetVisibilityMaskKHR(
 	    XrSession session,
@@ -186,7 +185,6 @@ private:
 	PFN_xrDestroyHandTrackerEXT pfnXrDestroyHandTrackerExt = nullptr;
 	PFN_xrLocateHandJointsEXT pfnXrLocateHandJointsExt = nullptr;
 	bool supportsG2Controller = false;
-	bool supportsPicoController = false;
 
 #if defined(SUPPORT_DX) && defined(SUPPORT_DX11)
 	PFN_xrGetD3D11GraphicsRequirementsKHR pfnXrGetD3D11GraphicsRequirementsKHR = nullptr;
