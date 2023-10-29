@@ -1,4 +1,11 @@
 # OpenComposite (OpenXR) - Play SteamVR games without SteamVR!
+
+This fork incorporates changes from the excelent [Skyrim VR OpenComposite Fixes](https://gitlab.com/coldbomb1/OpenOVR/-/tree/SkyrimVR_Bug_Fixes_Rolling?ref_type=heads) fork and some not yet merged pull requests for the origin.
+
+If you wish to use this fork, you need to compile the project from source.
+
+I am not a maintainer of the OpenComposite project.
+
 [![Discord](https://img.shields.io/discord/499733750209314816.svg?style=for-the-badge&logo=discord&label=discord)](https://discord.gg/zYA6Tzs)
 [![AppVeyor](https://img.shields.io/appveyor/ci/ZNix/openovr.svg?style=for-the-badge&logo=appveyor)](https://ci.appveyor.com/project/ZNix/openovr)
 # [>>>Join the Discord here for support<<<](https://discord.gg/zYA6Tzs)
