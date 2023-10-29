@@ -731,6 +731,10 @@ bool XrBackend::IsInputAvailable()
 
 void XrBackend::PumpEvents()
 {
+	BaseInput* input = GetUnsafeBaseInput();
+	if (input && !input->AreActionsLoaded() && sessionState == XR_SESSION_STATE_FOCUSED && !hand_left && !hand_right) {
+		QueryForInteractionProfile();
+	}
 	// Poll for OpenXR events
 	// TODO filter by session?
 	while (true) {
@@ -787,7 +791,8 @@ void XrBackend::PumpEvents()
 				break;
 			}
 		} else if (ev.type == XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED) {
-			UpdateInteractionProfile();
+			UpdateInteractionProfile();			
+			break;			
 		}
 
 	} // while loop
@@ -810,10 +815,7 @@ void XrBackend::PumpEvents()
 	   session when we can't even receive input anyway, as well as before the session is restarted for
 	   the temporary session.
    */
-	BaseInput* input = GetUnsafeBaseInput();
-	if (input && !input->AreActionsLoaded() && sessionState == XR_SESSION_STATE_FOCUSED && !hand_left && !hand_right) {
-		QueryForInteractionProfile();
-	}
+	
 }
 
 void XrBackend::OnSessionCreated()

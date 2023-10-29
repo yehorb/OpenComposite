@@ -894,8 +894,8 @@ uint32_t BaseOverlay::GetKeyboardText(char* pchText, uint32_t cchText)
 {
 	string str = keyboard ? VRKeyboard::CHAR_CONV.to_bytes(keyboard->contents()) : keyboardCache;
 
-	// Since keyboard is not functional yet, return this default text (Adventurer because this fix was made specifically for Skyrim VR)
-	str = "Adventurer";
+	// Since keyboard is not functional yet, return this configurable default text
+	str = oovr_global_configuration.KeyboardText();
 
 	// FFS, strncpy is secure.
 	strncpy_s(pchText, cchText, str.c_str(), cchText);
