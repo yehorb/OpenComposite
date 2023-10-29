@@ -487,8 +487,7 @@ bool BaseRenderModels::GetComponentState(const char* pchRenderModelName, const c
 	std::string componentName = pchComponentName;
 
 	ITrackedDevice::HandType hand = ITrackedDevice::HAND_NONE;
-	if (pchRenderModelName)
-	{
+	if (pchRenderModelName) {
 		std::string renderModelName = pchRenderModelName;
 		if (renderModelName == "renderLeftHand") {
 			hand = ITrackedDevice::HAND_LEFT;

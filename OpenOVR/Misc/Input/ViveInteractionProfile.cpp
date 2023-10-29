@@ -43,9 +43,9 @@ ViveWandInteractionProfile::ViveWandInteractionProfile()
 	};
 
 	/*
-	* Both transforms use values from the same file:
-	* SteamVR\resources\rendermodels\vr_controller_vive_1_5\vr_controller_vive_1_5.json
-	*/
+	 * Both transforms use values from the same file:
+	 * SteamVR\resources\rendermodels\vr_controller_vive_1_5\vr_controller_vive_1_5.json
+	 */
 	glm::mat4 inverseHandTransformLeft = {
 		{ 1.00000, -0.00000, 0.00000, 0.00000 },
 		{ 0.00000, 0.99614, -0.08780, 0.00000 },

@@ -111,5 +111,5 @@ void init_audio()
 		set_app_default_audio_device(dev);
 	} else {
 		OOVR_LOGF("Failed to get audio device output");
-	}		
+	}
 }

@@ -1,7 +1,7 @@
 #include "AudioOverride.h"
 
-#include <locale>
 #include <codecvt>
+#include <locale>
 #include <string>
 
 template <typename T>
@@ -230,7 +230,6 @@ HRESULT find_output_device(std::wstring& output, string audioOutputName)
 
 	return -1;
 }
-
 
 void set_app_default_audio_device(std::wstring device_id)
 {

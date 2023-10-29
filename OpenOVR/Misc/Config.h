@@ -64,7 +64,7 @@ private:
 	bool initUsingVulkan = false;
 	float hiddenMeshVerticalScale = 1.0f;
 	bool logAllOpenVRCalls = false;
-	bool enableAudioSwitch = false;	
+	bool enableAudioSwitch = false;
 	std::string audioDeviceName = "";
 	bool enableInputSmoothing = false;
 	int inputWindowSize = 5;

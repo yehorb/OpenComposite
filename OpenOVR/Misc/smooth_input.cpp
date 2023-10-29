@@ -2,36 +2,37 @@
 #include <algorithm>
 
 SmoothInput::SmoothInput(size_t smoothingWindowSize)
-    : leftGrip(smoothingWindowSize), 
-	leftTrigger(smoothingWindowSize), 
-	leftJoystickX(smoothingWindowSize), 
-	leftJoystickY(smoothingWindowSize), 
-	rightGrip(smoothingWindowSize), 
-	rightTrigger(smoothingWindowSize),
-	rightJoystickX(smoothingWindowSize), 
-	rightJoystickY(smoothingWindowSize), 
-	leftAButtonPress(smoothingWindowSize), 
-	leftBButtonPress(smoothingWindowSize), 
-	leftMenuPress(smoothingWindowSize),
-	rightAButtonPress(smoothingWindowSize), 
-	rightBButtonPress(smoothingWindowSize), 
-	rightMenuPress(smoothingWindowSize),
-	leftAButtonTouch(smoothingWindowSize), 
-	leftBButtonTouch(smoothingWindowSize), 
-	leftMenuTouch(smoothingWindowSize), 
-	rightAButtonTouch(smoothingWindowSize), 
-	rightBButtonTouch(smoothingWindowSize), 
-	rightMenuTouch(smoothingWindowSize), 
-	leftThumbClick(smoothingWindowSize), 
-	leftThumbTouch(smoothingWindowSize),
-	leftTriggerClick(smoothingWindowSize), 
-	leftTriggerTouch(smoothingWindowSize), 
-	leftGripClick(smoothingWindowSize), 
-	rightThumbClick(smoothingWindowSize), 
-	rightThumbTouch(smoothingWindowSize), 
-	rightTriggerClick(smoothingWindowSize), 
-	rightTriggerTouch(smoothingWindowSize), 
-	rightGripClick(smoothingWindowSize)
+    : smoothingWindowSize(smoothingWindowSize)
+    , leftGrip(smoothingWindowSize)
+    , leftTrigger(smoothingWindowSize)
+    , leftJoystickX(smoothingWindowSize)
+    , leftJoystickY(smoothingWindowSize)
+    , rightGrip(smoothingWindowSize)
+    , rightTrigger(smoothingWindowSize)
+    , rightJoystickX(smoothingWindowSize)
+    , rightJoystickY(smoothingWindowSize)
+    , leftAButtonPress(smoothingWindowSize)
+    , leftBButtonPress(smoothingWindowSize)
+    , leftMenuPress(smoothingWindowSize)
+    , rightAButtonPress(smoothingWindowSize)
+    , rightBButtonPress(smoothingWindowSize)
+    , rightMenuPress(smoothingWindowSize)
+    , leftAButtonTouch(smoothingWindowSize)
+    , leftBButtonTouch(smoothingWindowSize)
+    , leftMenuTouch(smoothingWindowSize)
+    , rightAButtonTouch(smoothingWindowSize)
+    , rightBButtonTouch(smoothingWindowSize)
+    , rightMenuTouch(smoothingWindowSize)
+    , leftThumbClick(smoothingWindowSize)
+    , leftThumbTouch(smoothingWindowSize)
+    , leftTriggerClick(smoothingWindowSize)
+    , leftTriggerTouch(smoothingWindowSize)
+    , leftGripClick(smoothingWindowSize)
+    , rightThumbClick(smoothingWindowSize)
+    , rightThumbTouch(smoothingWindowSize)
+    , rightTriggerClick(smoothingWindowSize)
+    , rightTriggerTouch(smoothingWindowSize)
+    , rightGripClick(smoothingWindowSize)
 {
 }
 

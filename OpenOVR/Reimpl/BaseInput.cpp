@@ -15,17 +15,17 @@
 #include <codecvt>
 #include <fstream>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <json/json.h>
 #include <locale>
 #include <map>
 #include <math.h>
 #include <optional>
 #include <set>
 #include <utility>
-#include <json/json.h>
 
 #include "Misc/Config.h"
-#include "Misc/xrmoreutils.h"
 #include "Misc/smooth_input.h"
+#include "Misc/xrmoreutils.h"
 
 // Use RenderModels for the pose offsets, which are the same as component positions
 #include "BaseRenderModels.h"
@@ -1719,8 +1719,6 @@ EVRInputError BaseInput::GetSkeletalSummaryData(VRActionHandle_t actionHandle, E
 	return getEstimatedSkeletalSummary(action->skeletalHand, pSkeletalSummaryData);
 }
 
-
-
 EVRInputError BaseInput::getRealSkeletalSummary(ITrackedDevice::HandType hand, VRSkeletalSummaryData_t* pSkeletalSummaryData)
 {
 	XrHandJointsLocateInfoEXT locateInfo = { XR_TYPE_HAND_JOINTS_LOCATE_INFO_EXT };
@@ -2310,7 +2308,7 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 			OOVR_FAILED_XR_ABORT(xrGetActionStateBoolean(xr_session.get(), &getInfo, &xs));
 			int storeState = xs.currentState;
 
-			if (inputSmoothingEnabled) {		
+			if (inputSmoothingEnabled) {
 				switch (shift) {
 				case vr::k_EButton_A:
 					smoothInput.updateAButtonTouchValue(hand, storeState);
@@ -2335,7 +2333,7 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 				default:
 					break;
 				}
-			}			
+			}
 
 			state->ulButtonTouched |= (uint64_t)(storeState != 0) << shift;
 		}
@@ -2346,14 +2344,14 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 
 	// Read the buttons
 
-	//Let them set these to null?
+	// Let them set these to null?
 	bindButton(ctrl.system, XR_NULL_HANDLE, vr::k_EButton_System, hand, inputSmoothingEnabled);
 	bindButton(ctrl.btnA, ctrl.btnATouch, vr::k_EButton_A, hand, inputSmoothingEnabled);
 	bindButton(ctrl.menu, ctrl.menuTouch, vr::k_EButton_ApplicationMenu, hand, inputSmoothingEnabled);
 	bindButton(ctrl.stickBtn, ctrl.stickBtnTouch, vr::k_EButton_SteamVR_Touchpad, hand, inputSmoothingEnabled);
 	bindButton(ctrl.gripClick, XR_NULL_HANDLE, vr::k_EButton_Grip, hand, inputSmoothingEnabled);
 	bindButton(ctrl.triggerClick, disableTriggerTouch ? XR_NULL_HANDLE : ctrl.triggerTouch, vr::k_EButton_SteamVR_Trigger, hand, inputSmoothingEnabled);
-	//bindButton(XR_NULL_HANDLE, XR_NULL_HANDLE, vr::k_EButton_Axis2); // FIXME clean up? Is this the grip?
+	// bindButton(XR_NULL_HANDLE, XR_NULL_HANDLE, vr::k_EButton_Axis2); // FIXME clean up? Is this the grip?
 
 	// Read the analogue values
 	auto readFloat = [](XrAction action) -> float {
@@ -2433,7 +2431,7 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 	grip.y = 0;
 
 	// SteamVR seemingly writes to these two axis to represent finger curl on legacy input.
-	VRSkeletalSummaryData_t skeletonData = {0};
+	VRSkeletalSummaryData_t skeletonData = { 0 };
 	if (xr_gbl->handTrackingProperties.supportsHandTracking) {
 		getRealSkeletalSummary((ITrackedDevice::HandType)hand, &skeletonData);
 	} else {

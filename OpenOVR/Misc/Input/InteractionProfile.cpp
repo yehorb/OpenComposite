@@ -139,10 +139,9 @@ glm::mat4 InteractionProfile::GetGripToSteamVRTransform(ITrackedDevice::HandType
 		return adjustTilt ? leftHandGripTransform * rotationMatrix : leftHandGripTransform;
 	} else if (hand == ITrackedDevice::HandType::HAND_RIGHT) {
 		return adjustTilt ? rightHandGripTransform * rotationMatrix : rightHandGripTransform;
-	} 
+	}
 	return glm::identity<glm::mat4>();
 }
-
 
 std::optional<glm::mat4> InteractionProfile::GetComponentTransform(ITrackedDevice::HandType hand, const std::string& name) const
 {

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <map>
 #include <memory>
 #include <optional>
@@ -12,7 +13,6 @@
 #include <unordered_set>
 #include <variant>
 #include <vector>
-#include <glm/gtc/matrix_inverse.hpp>
 
 #include "Drivers/Backend.h"
 #include "InputData.h"
@@ -145,9 +145,9 @@ public:
 	 * If hand == HAND_NONE, this will retrieve the HMD version of the property.
 	 */
 	template <typename T>
-	requires(in_variant<T, property_types>::value)
-	    std::optional<T> GetProperty(vr::ETrackedDeviceProperty property, ITrackedDevice::HandType hand)
-	const
+	    requires(in_variant<T, property_types>::value)
+	std::optional<T> GetProperty(vr::ETrackedDeviceProperty property, ITrackedDevice::HandType hand)
+	    const
 	{
 		using enum ITrackedDevice::HandType;
 		if (hand != HAND_NONE && propertiesMap.contains(property)) {
@@ -173,7 +173,7 @@ protected:
 		const char *trigger = nullptr, *triggerClick = nullptr, *triggerTouch = nullptr;
 		const char* grip = nullptr;
 
-		const char *haptic = nullptr;
+		const char* haptic = nullptr;
 
 		const char *gripPoseAction = nullptr, *aimPoseAction = nullptr;
 	};
