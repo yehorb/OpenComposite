@@ -4,13 +4,14 @@ If:
 
 Diagnostics:
   ClangTidy:
-    Add: bugprone-*
-    Add: clang-analyzer-*
-    Add: cppcoreguidelines-*
-    Add: hicpp-*
-    Add: misc-*
-    Add: modernize-*
-    Add: performance-*
-    Add: portability-*
-    Add: readability-*
+    Add:
+    - bugprone-*
+    - clang-analyzer-*
+    - cppcoreguidelines-*
+    - hicpp-*
+    - misc-*
+    - modernize-*
+    - performance-*
+    - portability-*
+    - readability-*
   UnusedIncludes: Strict
