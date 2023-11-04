@@ -126,7 +126,7 @@ VR_INTERFACE void* VR_CALLTYPE VR_GetGenericInterface(const char* interfaceVersi
 		correct_layout_unique ptr(impl, [](CVRCorrectLayout* cl) {
 			cl->Delete();
 		});
-		interfaces[interfaceVersion] = move(ptr);
+		interfaces[interfaceVersion] = std::move(ptr);
 		return impl;
 	}
 
