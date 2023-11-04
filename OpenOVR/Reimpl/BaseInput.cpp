@@ -1427,7 +1427,7 @@ void log_binary(uint64_t value, int hand, string addText)
 	}
 	binary_repr[index] = '\0'; // Null-terminate the string
 
-	OOVR_LOGF("hand: %d %s Binary representation: %s", hand, addText, binary_repr);
+	OOVR_LOGF("hand: %d %s Binary representation: %s", hand, addText.c_str(), binary_repr);
 }
 
 EVRInputError BaseInput::GetPoseActionData(VRActionHandle_t action, ETrackingUniverseOrigin eOrigin, float fPredictedSecondsFromNow,
