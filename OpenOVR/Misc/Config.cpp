@@ -192,7 +192,12 @@ int Config::ini_handler(void* user, const char* pSection,
 		CFGOPT(bool, disableTriggerTouch);
 		CFGOPT(float, hapticStrength);
 		CFGOPT(bool, disableTrackPad);
+		CFGOPT(bool, enableControllerSmoothing);
 		CFGOPT(string, keyboardText);
+		CFGOPT(float, posSmoothMinCutoff);
+		CFGOPT(float, rotSmoothMinCutoff);
+		CFGOPT(float, posSmoothBeta);
+		CFGOPT(float, rotSmoothBeta);
 	}
 
 #undef CFGOPT

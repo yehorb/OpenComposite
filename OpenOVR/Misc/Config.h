@@ -34,7 +34,12 @@ public:
 	inline bool DisableTriggerTouch() { return disableTriggerTouch; }
 	float HapticStrength() { return hapticStrength; }
 	inline bool DisableTrackPad() { return disableTrackPad; }
+	inline bool EnableControllerSmoothing()	{ return enableControllerSmoothing; }
 	std::string KeyboardText() { return keyboardText; }
+	float PosSmoothMinCutoff() { return posSmoothMinCutoff; }
+	float RotSmoothMinCutoff() { return rotSmoothMinCutoff; }
+	float PosSmoothBeta() { return posSmoothBeta; }
+	float RotSmoothBeta() { return rotSmoothBeta; }
 
 private:
 	static int ini_handler(
@@ -75,6 +80,11 @@ private:
 	bool disableTriggerTouch = false;
 	float hapticStrength = 0.1f;
 	bool disableTrackPad = false;
+	bool enableControllerSmoothing = false;
+	float posSmoothMinCutoff = 1.25;
+	float posSmoothBeta = 20;
+	float rotSmoothMinCutoff = 1.5;
+	float rotSmoothBeta = 0.2;
 	std::string keyboardText = "Adventurer";
 };
 
