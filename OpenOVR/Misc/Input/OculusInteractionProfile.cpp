@@ -8,6 +8,67 @@
 
 #include <glm/gtc/matrix_inverse.hpp>
 
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <thread>
+
+class CustomObject {
+public:
+	CustomObject(const std::string& str, const float arr1[3], const float arr2[3])
+	    : _str(str)
+	{
+		for (int i = 0; i < 3; ++i) {
+			_arr1[i] = arr1[i];
+			_arr2[i] = arr2[i];
+		}
+	}
+
+	const std::string& get_name() const
+	{
+		return _str;
+	}
+
+	const float (&get_array1() const)[3]
+	{
+		return _arr1;
+	}
+
+	const float (&get_array2() const)[3]
+	{
+		return _arr2;
+	}
+
+private:
+	std::string _str;
+	float _arr1[3];
+	float _arr2[3];
+};
+
+glm::mat4 convertTransform(CustomObject ctrlTransforms)
+{
+	// Convert the rotation values from degrees to radians
+	float rx = ctrlTransforms.get_array2()[0] * (3.14159265359 / 180);
+	float ry = ctrlTransforms.get_array2()[1] * (3.14159265359 / 180);
+	float rz = ctrlTransforms.get_array2()[2] * (3.14159265359 / 180);
+
+	// Calculate the sin and cosine values for the rotation angles
+	float sx = sin(rx);
+	float cx = cos(rx);
+	float sy = sin(ry);
+	float cy = cos(ry);
+	float sz = sin(rz);
+	float cz = cos(rz);
+
+	// Define the transformation matrix
+	return {
+		{ cy * cz, -cy * sz, sy, 0 },
+		{ cz * sx * sy + cx * sz, cx * cz - sx * sy * sz, -cy * sx, 0 },
+		{ -cx * cz * sy + sx * sz, cz * sx + cx * sy * sz, cx * cy, 0 },
+		{ ctrlTransforms.get_array1()[0], ctrlTransforms.get_array1()[1], ctrlTransforms.get_array1()[2], 1 }
+	};
+}
+
 OculusTouchInteractionProfile::OculusTouchInteractionProfile()
 {
 
@@ -88,54 +149,75 @@ OculusTouchInteractionProfile::OculusTouchInteractionProfile()
 
 	// Setup the grip-to-steamvr space matrices
 
-	// Made from values in: SteamVR\resources\rendermodels\oculus_quest2_controller_left\oculus_quest2_controller_left.json
-	glm::mat4 inverseHandTransformLeft = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000, },
-		{ 0.00000, 0.99614, -0.08780, 0.00000, },
-		{ 0.00000, 0.08780, 0.99614, 0.00000, },
-		{ 0.00000, 0.00300, 0.09700, 1.00000, }
-	};
+	float originLeft[3] = { 0.0, 0.003, 0.097 };
+	float rotationLeft[3] = { 5.037, 0.0, 0.0 };
+	CustomObject ctrlTransformLeft("handgrip_left", originLeft, rotationLeft);
 
-	// Made from values in: SteamVR\resources\rendermodels\oculus_quest2_controller_right\oculus_quest2_controller_right.json
-	glm::mat4 inverseHandTransformRight = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000, },
-		{ 0.00000, 0.99614, -0.08780, 0.00000, },
-		{ 0.00000, 0.08780, 0.99614, 0.00000, },
-		{ 0.00000, 0.00300, 0.09700, 1.00000, }
-	};
+	float originRight[3] = { 0.0, 0.003, 0.097 };
+	float rotationRight[3] = { 5.037, 0.0, 0.0 };
+	CustomObject ctrlTransformRight("handgrip_right", originRight, rotationRight);
 
-	leftHandGripTransform = glm::affineInverse(inverseHandTransformLeft);
-	rightHandGripTransform = glm::affineInverse(inverseHandTransformRight);
+	float originLeft2[3] = { 0.0, 0.003, 0.097 };
+	float rotationLeft2[3] = { 0.037, 0.0, 0.0 };
+	CustomObject ctrlTransformLeft2("handgrip_left", originLeft2, rotationLeft2);
 
-	glm::mat4 bodyLeft = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000, },
-		{ 0.00000, 0.99614, -0.08780, 0.00000, },
-		{ 0.00000, 0.08780, 0.99614, 0.00000, },
-		{ 0.00000, 0.00300, 0.09700, 1.00000, }
-	};
-	glm::mat4 bodyRight = {
-		{ 1.00000, -0.00000, 0.00000, 0.00000, },
-		{ 0.00000, 0.99614, -0.08780, 0.00000, },
-		{ 0.00000, 0.08780, 0.99614, 0.00000, },
-		{ 0.00000, 0.00300, 0.09700, 1.00000, }
-	};
-	glm::mat4 tipLeft = {
-		 { 1.00000, -0.00000, 0.00000, 0.00000, },
-		{ 0.00000, 0.79441, 0.60738, 0.00000, },
-		{ -0.00000, -0.60738, 0.79441, 0.00000, },
-		{ 0.01669, -0.02522, 0.02469, 1.00000, }
-	};
-	glm::mat4 tipRight = {
-		 { 1.00000, -0.00000, 0.00000, 0.00000, },
-		{ 0.00000, 0.79441, 0.60738, 0.00000, },
-		{ -0.00000, -0.60738, 0.79441, 0.00000, },
-		{ -0.01669, -0.02522, 0.02469, 1.00000, }
-	};
+	float originRight2[3] = { 0.0, 0.003, 0.097 };
+	float rotationRight2[3] = { 0.037, 0.0, 0.0 };
+	CustomObject ctrlTransformRight2("handgrip_right", originRight2, rotationRight2);
 
-	leftComponentTransforms["body"] = glm::affineInverse(bodyLeft);
-	rightComponentTransforms["body"] = glm::affineInverse(bodyRight);
-	leftComponentTransforms["tip"] = glm::affineInverse(tipLeft);
-	rightComponentTransforms["tip"] = glm::affineInverse(tipRight);
+	float originBaseLeft[3] = { -0.00554, -0.00735, 0.139 };
+	float rotationBaseLeft[3] = { -0.4, -180.0, 0.0 };
+	CustomObject baseTransformLeft("base_left", originBaseLeft, rotationBaseLeft);
+
+	float originBaseRight[3] = { 0.00554, -0.00735, 0.139 };
+	float rotationBaseRight[3] = { -0.4, -180.0, 0.0 };
+	CustomObject baseTransformRight("base_right", originBaseRight, rotationBaseRight);
+
+	float originBaseLeftNoRot[3] = { -0.00554, 0.00635, 0.000 };
+	float rotationBaseLeftNoRot[3] = { -20, 0.0, 0.0 };
+	CustomObject baseTransformLeftNoRot("base_leftnorot", originBaseLeftNoRot, rotationBaseLeftNoRot);
+
+	float originBaseRightNoRot[3] = { 0.00554, 0.00635, 0.000 };
+	float rotationBaseRightNoRot[3] = { -20, 0.0, 0.0 };
+	CustomObject baseTransformRightNoRot("base_rightnorot", originBaseRightNoRot, rotationBaseRightNoRot);
+
+	float originBodyLeft[3] = { 0.0, 0.003, 0.097 };
+	float rotationBodyLeft[3] = { 5.037, 0.0, 0.0 };
+	CustomObject bodyTransformLeft("body_left", originBodyLeft, rotationBodyLeft);
+
+	float originBodyRight[3] = { 0.0, 0.003, 0.097 };
+	float rotationBodyRight[3] = { 5.037, 0.0, 0.0 };
+	CustomObject bodyTransformRight("body_right", originBodyRight, rotationBodyRight);
+
+	float originTipLeft[3] = { 0.00629, -0.02522, 0.03469 };
+	float rotationTipLeft[3] = { -39.4, 0.0, 0.0 };
+	CustomObject tipTransformLeft("tip_left", originTipLeft, rotationTipLeft);
+
+	float originTipRight[3] = { -0.00629, -0.02522, 0.03469 };
+	float rotationTipRight[3] = { -39.4, 0.0, 0.0 };
+	CustomObject tipTransformRight("tip_right", originTipRight, rotationTipRight);
+
+	float originEmptyLeft[3] = { 0.0, 0.0, 0.0 };
+	float rotationEmptyLeft[3] = { 0.0, 0.0, 0.0 };
+	CustomObject emptyTransformLeft("body_left", originEmptyLeft, rotationEmptyLeft);
+
+	float originEmptyRight[3] = { 0.0, 0.0, 0.0 };
+	float rotationEmptyRight[3] = { 0.0, 0.0, 0.0 };
+	CustomObject emptyTransformRight("body_right", originEmptyRight, rotationEmptyRight);
+
+	//leftHandGripTransform = glm::affineInverse(convertTransform(baseTransformLeftNoRot) * convertTransform(ctrlTransformLeft));
+	//rightHandGripTransform = glm::affineInverse(convertTransform(baseTransformRightNoRot) * convertTransform(ctrlTransformRight));
+
+	leftHandGripTransform = glm::affineInverse(convertTransform(ctrlTransformLeft2));
+	rightHandGripTransform = glm::affineInverse(convertTransform(ctrlTransformRight2));
+	
+
+	leftComponentTransforms["body"] = glm::affineInverse(convertTransform(bodyTransformLeft));
+	rightComponentTransforms["body"] = glm::affineInverse(convertTransform(bodyTransformRight));
+	leftComponentTransforms["base"] = glm::affineInverse(convertTransform(baseTransformLeft));
+	rightComponentTransforms["base"] = glm::affineInverse(convertTransform(baseTransformRight));
+	leftComponentTransforms["tip"] = glm::affineInverse(convertTransform(tipTransformLeft));
+	rightComponentTransforms["tip"] = glm::affineInverse(convertTransform(tipTransformRight));
 }
 
 const std::string& OculusTouchInteractionProfile::GetPath() const
