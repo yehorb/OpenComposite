@@ -188,7 +188,11 @@ int Config::ini_handler(void* user, const char* pSection,
 		CFGOPT(bool, adjustTilt);
 		CFGOPT(float, tilt);
 		CFGOPT(float, leftDeadZoneSize);
+		CFGOPT(float, leftDeadZoneXSize);
+		CFGOPT(float, leftDeadZoneYSize);
 		CFGOPT(float, rightDeadZoneSize);
+		CFGOPT(float, rightDeadZoneXSize);
+		CFGOPT(float, rightDeadZoneYSize);
 		CFGOPT(bool, disableTriggerTouch);
 		CFGOPT(float, hapticStrength);
 		CFGOPT(bool, disableTrackPad);
@@ -254,6 +258,7 @@ Config::Config()
 	}
 
 	OOVR_LOG("Checking for global config file...");
+	OOVR_LOG("Version 1.7");
 	wstring file = dir + L"opencomposite.ini";
 	int err = wini_parse(file.c_str(), ini_handler, this);
 #else

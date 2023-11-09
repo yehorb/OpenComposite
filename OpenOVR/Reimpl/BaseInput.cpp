@@ -2377,16 +2377,22 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 	}
 
 	float deadZoneSize = 0.0f;
+	float deadZoneXSize = 0.0f;
+	float deadZoneYSize = 0.0f;
 	if (hand == 0) {
 		deadZoneSize = std::abs(oovr_global_configuration.LeftDeadZoneSize());
+		deadZoneXSize = std::abs(oovr_global_configuration.LeftDeadZoneXSize());
+		deadZoneYSize = std::abs(oovr_global_configuration.LeftDeadZoneYSize());
 	} else if (hand == 1) {
 		deadZoneSize = std::abs(oovr_global_configuration.RightDeadZoneSize());
+		deadZoneXSize = std::abs(oovr_global_configuration.RightDeadZoneXSize());
+		deadZoneYSize = std::abs(oovr_global_configuration.RightDeadZoneYSize());
 	}
 
-	if (std::abs(thumbstick.x) <= deadZoneSize) {
+	if (std::abs(thumbstick.x) <= deadZoneXSize || std::abs(thumbstick.x) <= deadZoneSize) {
 		thumbstick.x = 0.0f;
 	}
-	if (std::abs(thumbstick.y) <= deadZoneSize) {
+	if (std::abs(thumbstick.y) <= deadZoneYSize || std::abs(thumbstick.y) <= deadZoneSize) {
 		thumbstick.y = 0.0f;
 	}
 

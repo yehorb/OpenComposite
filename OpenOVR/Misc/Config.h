@@ -30,7 +30,11 @@ public:
 	inline bool AdjustTilt() { return adjustTilt; }
 	float Tilt() const { return tilt; }
 	float LeftDeadZoneSize() const { return leftDeadZoneSize; }
+	float LeftDeadZoneXSize() const { return leftDeadZoneXSize; }
+	float LeftDeadZoneYSize() const { return leftDeadZoneYSize; }
 	float RightDeadZoneSize() const { return rightDeadZoneSize; }
+	float RightDeadZoneXSize() const { return rightDeadZoneXSize; }
+	float RightDeadZoneYSize() const { return rightDeadZoneYSize; }
 	inline bool DisableTriggerTouch() { return disableTriggerTouch; }
 	float HapticStrength() { return hapticStrength; }
 	inline bool DisableTrackPad() { return disableTrackPad; }
@@ -76,7 +80,11 @@ private:
 	bool adjustTilt = false;
 	float tilt = 0.0f;
 	float leftDeadZoneSize = 0.0f;
+	float leftDeadZoneXSize = 0.0f;
+	float leftDeadZoneYSize = 0.0f;
 	float rightDeadZoneSize = 0.0f;
+	float rightDeadZoneXSize = 0.0f;
+	float rightDeadZoneYSize = 0.0f;
 	bool disableTriggerTouch = false;
 	float hapticStrength = 0.1f;
 	bool disableTrackPad = false;
