@@ -282,7 +282,32 @@ Config::Config()
 	}
 
 	if (err == -1) {
-		// Couldn't open file, no problen since the config file is optional and
+		// Couldn't open file, no problem since the config file is optional and
+		//  the defaults are set up as the default values for the variables
+		return;
+	} else if (err) {
+		// err is the line number
+		string str = "Config error on line " + to_string(err);
+		ABORT(str);
+	}
+
+	if (err == -1 || err == 0) {
+		// No such file or it was parsed successfully, check the working directory
+		// for a file that overrides some properties
+		char buff[FILENAME_MAX];
+		GetCurrentDir(buff, FILENAME_MAX);
+		file = wstring(&buff[0], &buff[strlen(buff)]);
+#ifdef _WIN32
+		file += L"\\opencomposite_ext.ini";
+#else
+		file += L"/opencomposite_ext.ini";
+#endif
+		OOVR_LOG("Checking for app specific extended config file...");
+		err = wini_parse(file.c_str(), ini_handler, this);
+	}
+
+	if (err == -1) {
+		// Couldn't open file, no problem since the config file is optional and
 		//  the defaults are set up as the default values for the variables
 		return;
 	} else if (err) {
