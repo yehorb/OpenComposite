@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 
-#include "KalmanFilter3D.cpp"
 #include "Misc/Config.h"
 #include "OneEuroFilterPosition.cpp"
 #include "OneEuroFilterRotation.cpp"
