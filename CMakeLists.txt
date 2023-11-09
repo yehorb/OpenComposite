@@ -240,6 +240,8 @@ add_library(OCCore STATIC
 	OpenOVR/Misc/Haptics.cpp
 	OpenOVR/Misc/xrutil.cpp
 	OpenOVR/Misc/xrmoreutils.cpp
+	OpenOVR/Misc/OneEuroFilterRotation.cpp
+	OpenOVR/Misc/OneEuroFilterPosition.cpp
 	OpenOVR/Misc/Keyboard/KeyboardLayout.cpp
 	OpenOVR/Misc/Keyboard/SudoFontMeta.cpp
 	OpenOVR/Misc/Keyboard/VRKeyboard.cpp
