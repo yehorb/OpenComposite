@@ -11,6 +11,8 @@
 #include "XrBackend.h"
 #include "generated/static_bases.gen.h"
 
+#include <thread>
+#include <chrono>
 #include <memory>
 #include <set>
 #include <string>
