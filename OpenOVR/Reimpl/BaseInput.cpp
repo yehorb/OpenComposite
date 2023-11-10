@@ -376,6 +376,7 @@ EVRInputError BaseInput::SetActionManifestPath(const char* pchActionManifestPath
 		actions.Reset();
 		actionSets.Reset();
 		DpadBindingInfo::parents.clear();
+		usingLegacyInput = false;
 	}
 
 	restartingSession = true;
@@ -1187,8 +1188,6 @@ void BaseInput::InternalUpdate()
 
 XrResult BaseInput::getBooleanOrDpadData(Action& action, const XrActionStateGetInfo* getInfo, XrActionStateBoolean* state)
 {
-	*state = { XR_TYPE_ACTION_STATE_BOOLEAN };
-
 	// If an action is bound to a dpad action in every profile, action.xr will be XR_NULL_HANDLE
 	if (action.xr != XR_NULL_HANDLE) {
 		XrResult ret = xrGetActionStateBoolean(xr_session.get(), getInfo, state);
@@ -1237,7 +1236,7 @@ XrResult BaseInput::getBooleanOrDpadData(Action& action, const XrActionStateGetI
 			break;
 		}
 		case DpadBindingInfo::Direction::EAST: {
-			within_bounds = (radius > DpadBindingInfo::dpadDeadzoneRadius) && (angle > -DpadBindingInfo::angle45deg || angle <= DpadBindingInfo::angle45deg);
+			within_bounds = (radius > DpadBindingInfo::dpadDeadzoneRadius) && (angle > -DpadBindingInfo::angle45deg && angle <= DpadBindingInfo::angle45deg);
 			break;
 		}
 		}
@@ -1411,8 +1410,6 @@ EVRInputError BaseInput::GetAnalogActionData(VRActionHandle_t action, InputAnalo
 		}
 	}
 
-	// TODO implement the deltas
-
 	return VRInputError_None;
 }
 
@@ -1584,17 +1581,6 @@ EVRInputError BaseInput::GetSkeletalActionData(VRActionHandle_t actionHandle, In
 	// activeOrigin = vr::k_ulInvalidActionHandle
 	ZeroMemory(out, unActionDataSize);
 
-	// If there's no action, say there's nothing on it
-	if (action == nullptr) {
-		return vr::VRInputError_None;
-	}
-
-	// Same for if the runtime doesn't support hand-tracking
-	if (!xr_gbl->handTrackingProperties.supportsHandTracking) {
-		OOVR_SOFT_ABORT("Runtime does not support hand-tracking, skeletal data unavailable");
-		return vr::VRInputError_None;
-	}
-
 	// Find the active origin for this hand
 	std::string originPath;
 	if (action->skeletalHand == ITrackedDevice::HAND_LEFT)
@@ -1603,9 +1589,10 @@ EVRInputError BaseInput::GetSkeletalActionData(VRActionHandle_t actionHandle, In
 		originPath = "/user/hand/right";
 	OOVR_FALSE_ABORT(GetInputSourceHandle(originPath.c_str(), &out->activeOrigin) == vr::VRInputError_None);
 
-	out->bActive = true; // TODO run xrLocateHandJointsEXT and use it's isActive
+	out->bActive = ivhToDev(out->activeOrigin) != nullptr;
 	return vr::VRInputError_None;
 }
+
 EVRInputError BaseInput::GetDominantHand(vr::ETrackedControllerRole* peDominantHand)
 {
 	// The API documentation says we need allowSetDominantHand for this, but that
@@ -1723,19 +1710,21 @@ EVRInputError BaseInput::GetSkeletalSummaryData(VRActionHandle_t actionHandle, E
 {
 	GET_ACTION_FROM_HANDLE(action, actionHandle);
 
-	if (action == nullptr) {
-		return vr::VRInputError_None;
+	ZeroMemory(pSkeletalSummaryData, sizeof(VRSkeletalSummaryData_t));
+
+	if (xr_gbl->handTrackingProperties.supportsHandTracking) {
+		return getRealSkeletalSummary(action->skeletalHand, pSkeletalSummaryData);
 	}
 
-	if (!xr_gbl->handTrackingProperties.supportsHandTracking) {
-		// TODO: generate our own data as mentioned above. We might want to use the
-		// generated summary data to generate the bone data.
-		OOVR_SOFT_ABORT("Runtime does not support hand-tracking, skeletal summary data unavailable");
-		return vr::VRInputError_None;
-	}
+	return getEstimatedSkeletalSummary(action->skeletalHand, pSkeletalSummaryData);
+}
 
+
+
+EVRInputError BaseInput::getRealSkeletalSummary(ITrackedDevice::HandType hand, VRSkeletalSummaryData_t* pSkeletalSummaryData)
+{
 	XrHandJointsLocateInfoEXT locateInfo = { XR_TYPE_HAND_JOINTS_LOCATE_INFO_EXT };
-	locateInfo.baseSpace = legacyControllers[(int)action->skeletalHand].aimPoseSpace;
+	locateInfo.baseSpace = legacyControllers[hand].aimPoseSpace;
 	locateInfo.time = xr_gbl->GetBestTime();
 
 	XrHandJointLocationsEXT locations = { XR_TYPE_HAND_JOINT_LOCATIONS_EXT };
@@ -1743,7 +1732,7 @@ EVRInputError BaseInput::GetSkeletalSummaryData(VRActionHandle_t actionHandle, E
 	std::vector<XrHandJointLocationEXT> jointLocations(locations.jointCount);
 	locations.jointLocations = jointLocations.data();
 
-	OOVR_FAILED_XR_ABORT(xr_ext->xrLocateHandJointsEXT(handTrackers[(int)action->skeletalHand], &locateInfo, &locations));
+	OOVR_FAILED_XR_ABORT(xr_ext->xrLocateHandJointsEXT(handTrackers[hand], &locateInfo, &locations));
 
 	if (!locations.isActive) {
 		// Leave empty-handed, IDK if this is the right error or not
@@ -1811,12 +1800,46 @@ EVRInputError BaseInput::GetSkeletalSummaryData(VRActionHandle_t actionHandle, E
 	}
 
 	for (int i = 0; i < 4; ++i) {
-		OOVR_SOFT_ABORT("Finger splay hardcoded at 0.2");
+		OOVR_LOG_ONCE("Finger splay hardcoded at 0.2");
 		pSkeletalSummaryData->flFingerSplay[i] = 0.2f; // TODO
 	}
 
 	return vr::VRInputError_None;
 }
+
+EVRInputError BaseInput::getEstimatedSkeletalSummary(ITrackedDevice::HandType hand, VRSkeletalSummaryData_t* pSkeletalSummaryData)
+{
+	OOVR_FALSE_ABORT(hand != ITrackedDevice::HAND_NONE);
+
+	std::fill(std::begin(pSkeletalSummaryData->flFingerSplay), std::end(pSkeletalSummaryData->flFingerSplay), 0.2);
+
+	LegacyControllerActions& controller = legacyControllers[hand];
+	XrActionStateGetInfo info = { XR_TYPE_ACTION_STATE_GET_INFO };
+	info.action = controller.gripClick;
+
+	XrActionStateBoolean state_grip = { XR_TYPE_ACTION_STATE_BOOLEAN };
+	OOVR_FAILED_XR_ABORT(xrGetActionStateBoolean(xr_session.get(), &info, &state_grip));
+
+	info.action = controller.trigger;
+
+	XrActionStateFloat state_trigger = { XR_TYPE_ACTION_STATE_FLOAT };
+	OOVR_FAILED_XR_ABORT(xrGetActionStateFloat(xr_session.get(), &info, &state_trigger));
+
+	if (state_grip.currentState) {
+		pSkeletalSummaryData->flFingerCurl[VRFinger_Middle] = 1.0;
+		pSkeletalSummaryData->flFingerCurl[VRFinger_Ring] = 1.0;
+		pSkeletalSummaryData->flFingerCurl[VRFinger_Pinky] = 1.0;
+	} else {
+		pSkeletalSummaryData->flFingerCurl[VRFinger_Middle] = state_trigger.currentState;
+		pSkeletalSummaryData->flFingerCurl[VRFinger_Ring] = state_trigger.currentState;
+		pSkeletalSummaryData->flFingerCurl[VRFinger_Pinky] = state_trigger.currentState;
+	}
+
+	pSkeletalSummaryData->flFingerCurl[VRFinger_Index] = state_trigger.currentState;
+
+	return vr::VRInputError_None;
+}
+
 EVRInputError BaseInput::GetSkeletalSummaryData(VRActionHandle_t action, VRSkeletalSummaryData_t* pSkeletalSummaryData)
 {
 	return GetSkeletalSummaryData(action, VRSummaryType_FromDevice, pSkeletalSummaryData);
@@ -2425,6 +2448,22 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 	if (disableTriggerTouch && trigger.x >= 0.3) {
 		state->ulButtonTouched |= ButtonMaskFromId(k_EButton_SteamVR_Trigger);
 	}
+
+	// SteamVR seemingly writes to these two axis to represent finger curl on legacy input.
+	VRSkeletalSummaryData_t skeletonData = {0};
+	if (xr_gbl->handTrackingProperties.supportsHandTracking) {
+		getRealSkeletalSummary((ITrackedDevice::HandType)hand, &skeletonData);
+	} else {
+		return true;
+	}
+
+	VRControllerAxis_t& fingers = state->rAxis[3];
+	fingers.x = skeletonData.flFingerCurl[1] * 1.66 * 1.33;
+	fingers.y = skeletonData.flFingerCurl[2] * 1.66;
+
+	VRControllerAxis_t& fingers2 = state->rAxis[4];
+	fingers2.x = skeletonData.flFingerCurl[3] * 1.66;
+	fingers2.y = skeletonData.flFingerCurl[4] * 1.66;
 
 	return true;
 }

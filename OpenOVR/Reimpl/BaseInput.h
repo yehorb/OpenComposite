@@ -786,4 +786,14 @@ private:
 	 * Get the state for a digital action, which could be bound to a DPad action.
 	 */
 	XrResult getBooleanOrDpadData(Action& action, const XrActionStateGetInfo* getInfo, XrActionStateBoolean* state);
+
+	/**
+	 * Uses the finger tracking extensions to generate a skeletal summary.
+	 */
+	EVRInputError getRealSkeletalSummary(ITrackedDevice::HandType hand, VRSkeletalSummaryData_t* pSkeletalSummaryData);
+
+	/**
+	 * Uses input state (trigger and grip) to generate a skeletal summary.
+	 */
+	EVRInputError getEstimatedSkeletalSummary(ITrackedDevice::HandType hand, VRSkeletalSummaryData_t* pSkeletalSummaryData);
 };
