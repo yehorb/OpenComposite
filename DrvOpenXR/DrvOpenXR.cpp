@@ -286,10 +286,6 @@ void DrvOpenXR::SetupSession()
 
 void DrvOpenXR::ShutdownSession()
 {
-	if (!currentBackend->sessionActive) {
-		OOVR_LOGF("Session is not active");
-		return;
-	}
 	BackendManager* instance = BackendManager::InstancePtr();
 	// Is it already being shut down?
 	// Note that this is indirectly called by the XrBackend destructor, which will have
@@ -304,22 +300,10 @@ void DrvOpenXR::ShutdownSession()
 	xr_gbl = nullptr;
 
 	// Hey it turns out that xrDestroySession can be called whenever - how convenient
-	OOVR_FAILED_XR_ABORT(xrRequestExitSession(xr_session.get()));
-	int count = 0;
-	while (currentBackend->sessionActive && count < 3) {
-		count++;
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		currentBackend->PumpEvents();
-	}
-		
+	// OOVR_FAILED_XR_ABORT(xrRequestExitSession(xr_session));
 
 	OOVR_FAILED_XR_ABORT(xrDestroySession(xr_session.get()));
 	xr_session.reset();
-
-	XrSystemGetInfo systemInfo{};
-	systemInfo.type = XR_TYPE_SYSTEM_GET_INFO;
-	systemInfo.formFactor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY;
-	OOVR_FAILED_XR_ABORT(xrGetSystem(xr_instance, &systemInfo, &xr_system));
 }
 
 void DrvOpenXR::FullShutdown()
