@@ -955,8 +955,8 @@ void XrBackend::MaybeRestartForInputs()
 {
 	// if we haven't attached any actions to the session (infoSet or game actions), no need to restart
 	BaseInput* input = GetUnsafeBaseInput();
-	if (infoSet == XR_NULL_HANDLE && (!input || !input->AreActionsLoaded()))
-		return;
+	//if (infoSet == XR_NULL_HANDLE && (!input || !input->AreActionsLoaded()))
+		//return;
 
 	OOVR_LOG("Restarting session for inputs...");
 	DrvOpenXR::SetupSession();
