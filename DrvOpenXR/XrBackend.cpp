@@ -97,6 +97,11 @@ XrBackend::~XrBackend()
 	temporaryGraphics.reset();
 }
 
+XrSessionState XrBackend::GetSessionState()
+{
+	return sessionState;
+}
+
 IHMD* XrBackend::GetPrimaryHMD()
 {
 	return hmd.get();
@@ -741,7 +746,6 @@ void XrBackend::PumpEvents()
 		XrEventDataBuffer ev = { XR_TYPE_EVENT_DATA_BUFFER };
 		XrResult res;
 		OOVR_FAILED_XR_ABORT(res = xrPollEvent(xr_instance, &ev));
-
 		if (res == XR_EVENT_UNAVAILABLE) {
 			break;
 		}			

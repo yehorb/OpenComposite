@@ -15,7 +15,7 @@
 #include <chrono>
 #include <memory>
 #include <set>
-#include <string>
+#include <string> 
 
 static XrBackend* currentBackend;
 static bool initialised = false;
@@ -73,6 +73,16 @@ static XrBool32 XRAPI_CALL debugCallback(
 	return XR_FALSE;
 }
 #endif
+
+
+void CreateSystemID()
+{
+	// Create a system - this is when we choose what form factor we want, in this case an HMD
+	XrSystemGetInfo systemInfo{};
+	systemInfo.type = XR_TYPE_SYSTEM_GET_INFO;
+	systemInfo.formFactor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY;
+	OOVR_FAILED_XR_ABORT(xrGetSystem(xr_instance, &systemInfo, &xr_system));
+}
 
 IBackend* DrvOpenXR::CreateOpenXRBackend()
 {
@@ -219,11 +229,8 @@ IBackend* DrvOpenXR::CreateOpenXRBackend()
 
 	// Load the function pointers for the extension functions
 	xr_ext = new XrExt(apiFlags, extensions);
-	// Create a system - this is when we choose what form factor we want, in this case an HMD
-	XrSystemGetInfo systemInfo{};
-	systemInfo.type = XR_TYPE_SYSTEM_GET_INFO;
-	systemInfo.formFactor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY;
-	OOVR_FAILED_XR_ABORT(xrGetSystem(xr_instance, &systemInfo, &xr_system));
+	
+	CreateSystemID();
 
 	// List off the views and store them locally for easy access
 	uint32_t viewCount = 0;
@@ -305,9 +312,16 @@ void DrvOpenXR::ShutdownSession()
 		// Hey it turns out that xrDestroySession can be called whenever - how convenient
 		OOVR_FAILED_XR_ABORT(xrRequestExitSession(xr_session.get()));
 		int count = 0;
-		while (currentBackend->sessionActive && count < 3) {
-			count++;
-			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		while (currentBackend->GetSessionState() != XR_SESSION_STATE_EXITING && count++ < 10) {
+			OOVR_LOGF("currentBackend: %d", currentBackend->GetSessionState());
+			const int durationMs = 250;
+			OOVR_LOGF("Session Exit state has not been reached yet, waiting %dms ...", durationMs);
+#ifdef _WIN32
+			Sleep(durationMs);
+#else
+			struct timespec ts = { 0, durationMs * 1000000 };
+			nanosleep(&ts, &ts);
+#endif
 			currentBackend->PumpEvents();
 		}
 	}
@@ -315,10 +329,7 @@ void DrvOpenXR::ShutdownSession()
 	OOVR_FAILED_XR_ABORT(xrDestroySession(xr_session.get()));
 	xr_session.reset();
 
-	XrSystemGetInfo systemInfo{};
-	systemInfo.type = XR_TYPE_SYSTEM_GET_INFO;
-	systemInfo.formFactor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY;
-	OOVR_FAILED_XR_ABORT(xrGetSystem(xr_instance, &systemInfo, &xr_system));
+	CreateSystemID();
 }
 
 void DrvOpenXR::FullShutdown()
