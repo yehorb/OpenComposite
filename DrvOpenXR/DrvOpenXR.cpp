@@ -272,6 +272,9 @@ void DrvOpenXR::SetupSession()
 		ShutdownSession();
 	}
 
+	XrGraphicsRequirementsD3D11KHR graphicsRequirements{ XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR };
+	OOVR_FAILED_XR_ABORT(xr_ext->xrGetD3D11GraphicsRequirementsKHR(xr_instance, xr_system, &graphicsRequirements));
+
 	XrSessionCreateInfo sessionInfo{};
 	sessionInfo.type = XR_TYPE_SESSION_CREATE_INFO;
 	sessionInfo.systemId = xr_system;
