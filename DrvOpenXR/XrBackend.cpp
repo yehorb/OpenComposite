@@ -46,6 +46,8 @@
 
 using namespace vr;
 
+static bool testOnlyOne = false;
+
 std::unique_ptr<TemporaryGraphics> XrBackend::temporaryGraphics = nullptr;
 XrBackend::XrBackend(bool useVulkanTmpGfx, bool useD3D11TmpGfx)
 {
@@ -737,8 +739,9 @@ bool XrBackend::IsInputAvailable()
 void XrBackend::PumpEvents()
 {
 	BaseInput* input = GetUnsafeBaseInput();
-	if (input && !input->AreActionsLoaded() && sessionState == XR_SESSION_STATE_FOCUSED && !hand_left && !hand_right) {
+	if (!testOnlyOne && input && !input->AreActionsLoaded() && sessionState == XR_SESSION_STATE_FOCUSED && !hand_left && !hand_right) {
 		QueryForInteractionProfile();
+		testOnlyOne = true;
 	}
 	// Poll for OpenXR events
 	// TODO filter by session?

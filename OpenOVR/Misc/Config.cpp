@@ -186,7 +186,23 @@ int Config::ini_handler(void* user, const char* pSection,
 		CFGOPT(bool, enableInputSmoothing);
 		CFGOPT(int, inputWindowSize);
 		CFGOPT(bool, adjustTilt);
+		CFGOPT(bool, adjustLeftRotation);
+		CFGOPT(bool, adjustRightRotation);
+		CFGOPT(bool, adjustLeftPosition);
+		CFGOPT(bool, adjustRightPosition);
 		CFGOPT(float, tilt);
+		CFGOPT(float, leftXRotation);
+		CFGOPT(float, leftYRotation);
+		CFGOPT(float, leftZRotation);
+		CFGOPT(float, rightXRotation);
+		CFGOPT(float, rightYRotation);
+		CFGOPT(float, rightZRotation);
+		CFGOPT(float, leftXPosition);
+		CFGOPT(float, leftYPosition);
+		CFGOPT(float, leftZPosition);
+		CFGOPT(float, rightXPosition);
+		CFGOPT(float, rightYPosition);
+		CFGOPT(float, rightZPosition);
 		CFGOPT(float, leftDeadZoneSize);
 		CFGOPT(float, leftDeadZoneXSize);
 		CFGOPT(float, leftDeadZoneYSize);
@@ -258,7 +274,7 @@ Config::Config()
 	}
 
 	OOVR_LOG("Checking for global config file...");
-	OOVR_LOG("Version 1.7");
+	OOVR_LOG("Version 1.9");
 	wstring file = dir + L"opencomposite.ini";
 	int err = wini_parse(file.c_str(), ini_handler, this);
 #else

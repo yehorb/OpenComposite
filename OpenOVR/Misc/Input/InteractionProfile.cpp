@@ -128,22 +128,93 @@ InteractionProfile* InteractionProfile::GetProfileByPath(const string& name)
 	return byPath.at(name);
 }
 
+glm::mat4 InteractionProfile::ConvertTransform(CustomObject ctrlTransforms) const
+{
+	// Convert the rotation values from degrees to radians
+	float rx = ctrlTransforms.get_array2()[0] * (3.14159265359 / 180);
+	float ry = ctrlTransforms.get_array2()[1] * (3.14159265359 / 180);
+	float rz = ctrlTransforms.get_array2()[2] * (3.14159265359 / 180);
+
+	// Calculate the sin and cosine values for the rotation angles
+	float sx = sin(rx);
+	float cx = cos(rx);
+	float sy = sin(ry);
+	float cy = cos(ry);
+	float sz = sin(rz);
+	float cz = cos(rz);
+
+	// Define the transformation matrix
+	return {
+		{ cy * cz, -cy * sz, sy, 0 },
+		{ cz * sx * sy + cx * sz, cx * cz - sx * sy * sz, -cy * sx, 0 },
+		{ -cx * cz * sy + sx * sz, cz * sx + cx * sy * sz, cx * cy, 0 },
+		{ ctrlTransforms.get_array1()[0], ctrlTransforms.get_array1()[1], ctrlTransforms.get_array1()[2], 1 }
+	};
+}
+
+glm::mat4 InteractionProfile::CreateRotationMatrix(float xDegrees, float yDegrees, float zDegrees) const
+{
+	glm::mat4 xRot = glm::rotate(glm::mat4(1.0f), glm::radians(xDegrees), glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 yRot = glm::rotate(glm::mat4(1.0f), glm::radians(yDegrees), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 zRot = glm::rotate(glm::mat4(1.0f), glm::radians(zDegrees), glm::vec3(0.0f, 0.0f, 1.0f));
+	return xRot * yRot * zRot;
+}
+
 glm::mat4 InteractionProfile::GetGripToSteamVRTransform(ITrackedDevice::HandType hand) const
 {
+	bool adjustLeftRotation = oovr_global_configuration.AdjustLeftRotation();
+	bool adjustRightRotation = oovr_global_configuration.AdjustRightRotation();
+	bool adjustLeftPosition = oovr_global_configuration.AdjustLeftPosition();
+	bool adjustRightPosition = oovr_global_configuration.AdjustRightPosition();
 	bool adjustTilt = oovr_global_configuration.AdjustTilt();
-	float degrees = oovr_global_configuration.Tilt();
+	float tiltDegrees = oovr_global_configuration.Tilt();
 
-	// Convert degrees to radians
-	float radians = glm::radians(degrees);
+	float positionLeft[3] = { 0.0, 0.0, 0.0 };
+	float rotationLeft[3] = { 0.0, 0.0, 0.0 };
+	if (adjustLeftPosition) {
+		positionLeft[0] = oovr_global_configuration.LeftXPosition();
+		positionLeft[1] = oovr_global_configuration.LeftYPosition();
+		positionLeft[2] = oovr_global_configuration.LeftZPosition();
+	}
+	if (adjustLeftRotation) {
+		rotationLeft[0] = oovr_global_configuration.LeftXRotation();
+		rotationLeft[1] = oovr_global_configuration.LeftYRotation();
+		rotationLeft[2] = oovr_global_configuration.LeftZRotation();
+	}
+	CustomObject ctrlTransformLeft("adjust_left", positionLeft, rotationLeft);
 
-	// Create a rotation matrix around the X-axis
-	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), radians, glm::vec3(1.0f, 0.0f, 0.0f));
+	float positionRight[3] = { 0.0, 0.0, 0.0 };
+	float rotationRight[3] = { 0.0, 0.0, 0.0 };
+	if (adjustRightPosition) {
+		positionRight[0] = oovr_global_configuration.RightXPosition();
+		positionRight[1] = oovr_global_configuration.RightYPosition();
+		positionRight[2] = oovr_global_configuration.RightZPosition();
+	}
+	if (adjustRightRotation) {
+		rotationRight[0] = oovr_global_configuration.RightXRotation();
+		rotationRight[1] = oovr_global_configuration.RightYRotation();
+		rotationRight[2] = oovr_global_configuration.RightZRotation();
+	}
+	CustomObject ctrlTransformRight("adjust_right", positionRight, rotationRight);
+
+	glm::mat4 rotationMatrix = CreateRotationMatrix(tiltDegrees, 0, 0);
 
 	if (hand == ITrackedDevice::HandType::HAND_LEFT) {
-		return adjustTilt ? leftHandGripTransform * rotationMatrix : leftHandGripTransform;
+		if (adjustLeftRotation || adjustLeftPosition) {
+			return leftHandGripTransform * ConvertTransform(ctrlTransformLeft);
+		} else if (adjustTilt) {
+			return leftHandGripTransform * rotationMatrix;
+		}
+		return leftHandGripTransform;
 	} else if (hand == ITrackedDevice::HandType::HAND_RIGHT) {
-		return adjustTilt ? rightHandGripTransform * rotationMatrix : rightHandGripTransform;
-	} 
+		if (adjustRightRotation || adjustRightPosition) {
+			return rightHandGripTransform * ConvertTransform(ctrlTransformRight);
+		} else if (adjustTilt) {
+			return rightHandGripTransform * rotationMatrix;
+		}
+		return rightHandGripTransform;
+	}
+
 	return glm::identity<glm::mat4>();
 }
 

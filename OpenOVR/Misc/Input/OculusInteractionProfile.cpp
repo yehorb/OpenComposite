@@ -13,62 +13,6 @@
 #include <string>
 #include <thread>
 
-class CustomObject {
-public:
-	CustomObject(const std::string& str, const float arr1[3], const float arr2[3])
-	    : _str(str)
-	{
-		for (int i = 0; i < 3; ++i) {
-			_arr1[i] = arr1[i];
-			_arr2[i] = arr2[i];
-		}
-	}
-
-	const std::string& get_name() const
-	{
-		return _str;
-	}
-
-	const float (&get_array1() const)[3]
-	{
-		return _arr1;
-	}
-
-	const float (&get_array2() const)[3]
-	{
-		return _arr2;
-	}
-
-private:
-	std::string _str;
-	float _arr1[3];
-	float _arr2[3];
-};
-
-glm::mat4 convertTransform(CustomObject ctrlTransforms)
-{
-	// Convert the rotation values from degrees to radians
-	float rx = ctrlTransforms.get_array2()[0] * (3.14159265359 / 180);
-	float ry = ctrlTransforms.get_array2()[1] * (3.14159265359 / 180);
-	float rz = ctrlTransforms.get_array2()[2] * (3.14159265359 / 180);
-
-	// Calculate the sin and cosine values for the rotation angles
-	float sx = sin(rx);
-	float cx = cos(rx);
-	float sy = sin(ry);
-	float cy = cos(ry);
-	float sz = sin(rz);
-	float cz = cos(rz);
-
-	// Define the transformation matrix
-	return {
-		{ cy * cz, -cy * sz, sy, 0 },
-		{ cz * sx * sy + cx * sz, cx * cz - sx * sy * sz, -cy * sx, 0 },
-		{ -cx * cz * sy + sx * sz, cz * sx + cx * sy * sz, cx * cy, 0 },
-		{ ctrlTransforms.get_array1()[0], ctrlTransforms.get_array1()[1], ctrlTransforms.get_array1()[2], 1 }
-	};
-}
-
 OculusTouchInteractionProfile::OculusTouchInteractionProfile()
 {
 
@@ -208,16 +152,16 @@ OculusTouchInteractionProfile::OculusTouchInteractionProfile()
 	//leftHandGripTransform = glm::affineInverse(convertTransform(baseTransformLeftNoRot) * convertTransform(ctrlTransformLeft));
 	//rightHandGripTransform = glm::affineInverse(convertTransform(baseTransformRightNoRot) * convertTransform(ctrlTransformRight));
 
-	leftHandGripTransform = glm::affineInverse(convertTransform(ctrlTransformLeft2));
-	rightHandGripTransform = glm::affineInverse(convertTransform(ctrlTransformRight2));
+	leftHandGripTransform = glm::affineInverse(ConvertTransform(ctrlTransformLeft2));
+	rightHandGripTransform = glm::affineInverse(ConvertTransform(ctrlTransformRight2));
 	
 
-	leftComponentTransforms["body"] = glm::affineInverse(convertTransform(bodyTransformLeft));
-	rightComponentTransforms["body"] = glm::affineInverse(convertTransform(bodyTransformRight));
-	leftComponentTransforms["base"] = glm::affineInverse(convertTransform(baseTransformLeft));
-	rightComponentTransforms["base"] = glm::affineInverse(convertTransform(baseTransformRight));
-	leftComponentTransforms["tip"] = glm::affineInverse(convertTransform(tipTransformLeft));
-	rightComponentTransforms["tip"] = glm::affineInverse(convertTransform(tipTransformRight));
+	leftComponentTransforms["body"] = glm::affineInverse(ConvertTransform(bodyTransformLeft));
+	rightComponentTransforms["body"] = glm::affineInverse(ConvertTransform(bodyTransformRight));
+	leftComponentTransforms["base"] = glm::affineInverse(ConvertTransform(baseTransformLeft));
+	rightComponentTransforms["base"] = glm::affineInverse(ConvertTransform(baseTransformRight));
+	leftComponentTransforms["tip"] = glm::affineInverse(ConvertTransform(tipTransformLeft));
+	rightComponentTransforms["tip"] = glm::affineInverse(ConvertTransform(tipTransformRight));
 }
 
 const std::string& OculusTouchInteractionProfile::GetPath() const

@@ -28,7 +28,23 @@ public:
 	inline bool EnableInputSmoothing() { return enableInputSmoothing; }
 	int InputWindowSize() const { return inputWindowSize; }
 	inline bool AdjustTilt() { return adjustTilt; }
+	inline bool AdjustLeftRotation() { return adjustLeftRotation; }
+	inline bool AdjustRightRotation() { return adjustRightRotation; }
+	inline bool AdjustLeftPosition() { return adjustLeftPosition; }
+	inline bool AdjustRightPosition() { return adjustRightPosition; }
 	float Tilt() const { return tilt; }
+	float LeftXRotation() const { return leftXRotation; }
+	float LeftYRotation() const { return leftYRotation; }
+	float LeftZRotation() const { return leftZRotation; }
+	float RightXRotation() const { return rightXRotation; }
+	float RightYRotation() const { return rightYRotation; }
+	float RightZRotation() const { return rightZRotation; }
+	float LeftXPosition() const { return leftXPosition; }
+	float LeftYPosition() const { return leftYPosition; }
+	float LeftZPosition() const { return leftZPosition; }
+	float RightXPosition() const { return rightXPosition; }
+	float RightYPosition() const { return rightYPosition; }
+	float RightZPosition() const { return rightZPosition; }
 	float LeftDeadZoneSize() const { return leftDeadZoneSize; }
 	float LeftDeadZoneXSize() const { return leftDeadZoneXSize; }
 	float LeftDeadZoneYSize() const { return leftDeadZoneYSize; }
@@ -78,7 +94,28 @@ private:
 	bool enableInputSmoothing = false;
 	int inputWindowSize = 5;
 	bool adjustTilt = false;
+
+	bool adjustLeftRotation = false;
+	bool adjustRightRotation = false;
+	bool adjustLeftPosition = false;
+	bool adjustRightPosition = false;
+
 	float tilt = 0.0f;
+
+	float leftXRotation = 0.0f;
+	float leftYRotation = 0.0f;
+	float leftZRotation = 0.0f;
+	float rightXRotation = 0.0f;
+	float rightYRotation = 0.0f;
+	float rightZRotation = 0.0f;
+
+	float leftXPosition = 0.0f;
+	float leftYPosition = 0.0f;
+	float leftZPosition = 0.0f;
+	float rightXPosition = 0.0f;
+	float rightYPosition = 0.0f;
+	float rightZPosition = 0.0f;
+
 	float leftDeadZoneSize = 0.0f;
 	float leftDeadZoneXSize = 0.0f;
 	float leftDeadZoneYSize = 0.0f;
