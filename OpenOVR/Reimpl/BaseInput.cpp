@@ -1053,6 +1053,7 @@ void BaseInput::CreateLegacyActions()
 		create(&ctrl.stickY, "thumbstick-y", "Thumbstick Y axis", XR_ACTION_TYPE_FLOAT_INPUT);
 
 		create(&ctrl.trackPadClick, "trackpad-btn", "Trackpad Click", XR_ACTION_TYPE_BOOLEAN_INPUT);
+		create(&ctrl.trackPadTouch, "trackpad-btn-touch", "Trackpad Touch", XR_ACTION_TYPE_BOOLEAN_INPUT);
 		create(&ctrl.trackPadX, "trackpad-x", "Trackpad X axis", XR_ACTION_TYPE_FLOAT_INPUT);
 		create(&ctrl.trackPadY, "trackpad-y", "Trackpad Y axis", XR_ACTION_TYPE_FLOAT_INPUT);
 
@@ -2353,6 +2354,8 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 	bindButton(ctrl.stickBtn, ctrl.stickBtnTouch, vr::k_EButton_SteamVR_Touchpad, hand, inputSmoothingEnabled);
 	bindButton(ctrl.gripClick, XR_NULL_HANDLE, vr::k_EButton_Grip, hand, inputSmoothingEnabled);
 	bindButton(ctrl.triggerClick, disableTriggerTouch ? XR_NULL_HANDLE : ctrl.triggerTouch, vr::k_EButton_SteamVR_Trigger, hand, inputSmoothingEnabled);
+	//this will make thumb curl when index controller's trackpad detects a touch
+	bindButton(XR_NULL_HANDLE, ctrl.trackPadTouch, vr::k_EButton_SteamVR_Touchpad, hand, inputSmoothingEnabled);
 	//bindButton(XR_NULL_HANDLE, XR_NULL_HANDLE, vr::k_EButton_Axis2); // FIXME clean up? Is this the grip?
 
 	// Read the analogue values
@@ -2371,6 +2374,18 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 			return 0;
 		}
 	};
+
+	auto readBool = [](XrAction action) -> bool {
+		if (!action)
+			return false;
+
+		XrActionStateGetInfo getInfo = { XR_TYPE_ACTION_STATE_GET_INFO };
+		getInfo.action = action;
+
+		XrActionStateBoolean as = { XR_TYPE_ACTION_STATE_BOOLEAN };
+		OOVR_FAILED_XR_ABORT(xrGetActionStateBoolean(xr_session.get(), &getInfo, &as));
+		return as.isActive ? as.currentState : false;
+		};
 
 	if (!oovr_global_configuration.DisableTrackPad() && ctrl.trackPadClick && ctrl.trackPadY) {
 		XrActionStateGetInfo getInfo = { XR_TYPE_ACTION_STATE_GET_INFO };
@@ -2438,7 +2453,8 @@ bool BaseInput::GetLegacyControllerState(vr::TrackedDeviceIndex_t controllerDevi
 
 	grip.y = 0;
 
-	if (grip.x >= 0.6) {
+	// changed from grip threshold to gripClick to prevent issue with k_EButton_Grip and k_EButton_Axis2 buttons being too sensitive on index controller
+	if ((inputSmoothingEnabled && smoothInput.getSmoothedGripClickValue(hand)) || (!inputSmoothingEnabled && readBool(ctrl.gripClick))) {
 		state->ulButtonPressed |= ButtonMaskFromId(k_EButton_Grip);
 		state->ulButtonPressed |= ButtonMaskFromId(k_EButton_Axis2);
 	}
