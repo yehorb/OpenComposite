@@ -82,6 +82,7 @@ IndexControllerInteractionProfile::IndexControllerInteractionProfile()
 	this->bindingsLegacy.aimPoseAction = "input/aim/pose";
 
 	this->bindingsLegacy.trackPadTouch = "input/trackpad/touch";
+	this->bindingsLegacy.trackPadClick = "input/trackpad/force";
 
 	hmdPropertiesMap = {
 		{ vr::Prop_ManufacturerName_String, "Valve" },
