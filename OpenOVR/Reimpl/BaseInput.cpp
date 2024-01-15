@@ -1509,6 +1509,12 @@ EVRInputError BaseInput::GetPoseActionData(VRActionHandle_t action, ETrackingUni
 			case PoseBindingPoint::TIP:
 				componentName = "tip";
 				break;
+			case PoseBindingPoint::BODY:
+				componentName = "body";
+				break;
+			case PoseBindingPoint::GDC2015:
+				componentName = "gdc2015";
+				break;
 			}
 
 			// Add the component transform, if required
