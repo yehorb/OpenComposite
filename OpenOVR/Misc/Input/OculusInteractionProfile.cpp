@@ -147,6 +147,21 @@ const std::string& OculusTouchInteractionProfile::GetPath() const
 	return path;
 }
 
+std::optional<const char*> OculusTouchInteractionProfile::GetLeftHandRenderModelName() const
+{
+	return "oculus_quest2_controller_left";
+}
+
+std::optional<const char*> OculusTouchInteractionProfile::GetRightHandRenderModelName() const
+{
+	return "oculus_quest2_controller_right";
+}
+
+std::optional<const char*> OculusTouchInteractionProfile::GetOpenVRName() const
+{
+	return "oculus_touch";
+}
+
 const InteractionProfile::LegacyBindings* OculusTouchInteractionProfile::GetLegacyBindings(const std::string& handPath) const
 {
 	static LegacyBindings allBindings[2] = { {}, {} };
@@ -194,9 +209,4 @@ const InteractionProfile::LegacyBindings* OculusTouchInteractionProfile::GetLega
 	}
 
 	return &bindings;
-}
-
-std::optional<const char*> OculusTouchInteractionProfile::GetOpenVRName() const
-{
-	return "oculus_touch";
 }
