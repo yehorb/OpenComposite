@@ -420,8 +420,7 @@ uint32_t BaseRenderModels::GetComponentName(const char* pchRenderModelName, uint
 	    && name != "oculus_quest2_controller_left"
 	    && name != "oculus_quest2_controller_right"
 	    && name != "{indexcontroller}valve_controller_knu_1_0_left"
-	    && name != "{indexcontroller}valve_controller_knu_1_0_right")
-	{
+	    && name != "{indexcontroller}valve_controller_knu_1_0_right") {
 		string err = "Unknown render model name: " + string(pchRenderModelName);
 		OOVR_ABORT(err.c_str());
 		return VRRenderModelError_None;
@@ -463,8 +462,7 @@ uint32_t BaseRenderModels::GetComponentRenderModelName(const char* pchRenderMode
 	    && name != "oculus_quest2_controller_left"
 	    && name != "oculus_quest2_controller_right"
 	    && name != "{indexcontroller}valve_controller_knu_1_0_left"
-	    && name != "{indexcontroller}valve_controller_knu_1_0_right")
-	{
+	    && name != "{indexcontroller}valve_controller_knu_1_0_right") {
 		string err = "Unknown render model name: " + string(pchRenderModelName);
 		OOVR_ABORT(err.c_str());
 		return VRRenderModelError_None;

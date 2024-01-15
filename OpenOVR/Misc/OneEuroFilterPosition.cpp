@@ -63,7 +63,8 @@ public:
 		    zFilter.filter(position.z, velocity.z));
 	}
 
-	void setFreq(double freq) {
+	void setFreq(double freq)
+	{
 		xFilter.setFreq(freq);
 		yFilter.setFreq(freq);
 		zFilter.setFreq(freq);

@@ -7,10 +7,10 @@
 #pragma once
 
 #include "generated/interfaces/vrtypes.h"
+#include <Drivers/Backend.h>
 #include <glm/mat4x4.hpp>
 #include <openxr/openxr.h>
 #include <optional>
-#include <Drivers/Backend.h>
 
 namespace xr_utils {
 

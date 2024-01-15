@@ -54,7 +54,7 @@ public:
 	inline bool DisableTriggerTouch() { return disableTriggerTouch; }
 	float HapticStrength() { return hapticStrength; }
 	inline bool DisableTrackPad() { return disableTrackPad; }
-	inline bool EnableControllerSmoothing()	{ return enableControllerSmoothing; }
+	inline bool EnableControllerSmoothing() { return enableControllerSmoothing; }
 	inline bool EnableVRIKKnucklesTrackPadSupport() { return enableVRIKKnucklesTrackPadSupport; }
 	std::string KeyboardText() { return keyboardText; }
 	float PosSmoothMinCutoff() { return posSmoothMinCutoff; }
