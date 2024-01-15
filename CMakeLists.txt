@@ -259,6 +259,8 @@ add_library(OCCore STATIC
 	OpenOVR/Misc/Haptics.cpp
 	OpenOVR/Misc/xrutil.cpp
 	OpenOVR/Misc/xrmoreutils.cpp
+	OpenOVR/Misc/OneEuroFilterRotation.cpp
+	OpenOVR/Misc/OneEuroFilterPosition.cpp
 	OpenOVR/Misc/Keyboard/KeyboardLayout.cpp
 	OpenOVR/Misc/Keyboard/SudoFontMeta.cpp
 	OpenOVR/Misc/Keyboard/VRKeyboard.cpp
@@ -375,7 +377,7 @@ add_library(OCCore STATIC
 	${GENERATED_DIR}/interfaces/vrtypes.h
 )
 target_include_directories(OCCore PUBLIC OpenOVR ${CMAKE_BINARY_DIR})  # TODO make this private and put the public headers elsewhere
-target_include_directories(OCCore PRIVATE BundledLibs OpenVRHeaders ${XrDir}/src/external/jsoncpp/include)
+target_include_directories(OCCore PRIVATE BundledLibs OpenVRHeaders ${XrDir}/src/external/jsoncpp/include libs/eigen-3.4.0/Eigen)
 target_compile_definitions(OCCore PRIVATE ${GRAPHICS_API_SUPPORT_FLAGS})
 
 target_link_libraries(OCCore OpenVR Vulkan ${XrLib} ${glmLib})

@@ -11,11 +11,11 @@
 #include "XrBackend.h"
 #include "generated/static_bases.gen.h"
 
-#include <thread>
 #include <chrono>
 #include <memory>
 #include <set>
 #include <string>
+#include <thread>
 
 static XrBackend* currentBackend;
 static bool initialised = false;
@@ -228,7 +228,7 @@ IBackend* DrvOpenXR::CreateOpenXRBackend()
 
 	// Load the function pointers for the extension functions
 	xr_ext = new XrExt(apiFlags, extensions);
-	
+
 	CreateSystemID();
 
 	// List off the views and store them locally for easy access
@@ -271,6 +271,9 @@ void DrvOpenXR::SetupSession()
 		ShutdownSession();
 	}
 
+	XrGraphicsRequirementsD3D11KHR graphicsRequirements{ XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR };
+	OOVR_FAILED_XR_ABORT(xr_ext->xrGetD3D11GraphicsRequirementsKHR(xr_instance, xr_system, &graphicsRequirements));
+
 	XrSessionCreateInfo sessionInfo{};
 	sessionInfo.type = XR_TYPE_SESSION_CREATE_INFO;
 	sessionInfo.systemId = xr_system;
@@ -312,6 +315,7 @@ void DrvOpenXR::ShutdownSession()
 		OOVR_FAILED_XR_ABORT(xrRequestExitSession(xr_session.get()));
 		int count = 0;
 		while (currentBackend->GetSessionState() != XR_SESSION_STATE_EXITING && count++ < 10) {
+			OOVR_LOGF("currentBackend: %d", currentBackend->GetSessionState());
 			const int durationMs = 250;
 			OOVR_LOGF("Session Exit state has not been reached yet, waiting %dms ...", durationMs);
 #ifdef _WIN32

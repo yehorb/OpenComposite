@@ -190,10 +190,12 @@ void XrController::GetPose(vr::ETrackingUniverseOrigin origin, vr::TrackedDevice
 		return;
 	}
 
-	// Find the hand transform matrix, and include that
-	glm::mat4 transform = profile.GetGripToSteamVRTransform(GetHand());
+	HandType hand = GetHand();
 
-	xr_utils::PoseFromSpace(pose, space, origin, transform);
+	// Find the hand transform matrix, and include that
+	glm::mat4 transform = profile.GetGripToSteamVRTransform(hand);
+
+	xr_utils::PoseFromSpace(pose, space, origin, transform, hand);
 }
 
 vr::ETrackedDeviceClass XrController::GetTrackedDeviceClass()

@@ -18,6 +18,38 @@
 #include "InputData.h"
 #include "LegacyControllerActions.h"
 
+class CustomObject {
+public:
+	CustomObject(const std::string& str, const float arr1[3], const float arr2[3])
+	    : _str(str)
+	{
+		for (int i = 0; i < 3; ++i) {
+			_arr1[i] = arr1[i];
+			_arr2[i] = arr2[i];
+		}
+	}
+
+	const std::string& get_name() const
+	{
+		return _str;
+	}
+
+	const float (&get_array1() const)[3]
+	{
+		return _arr1;
+	}
+
+	const float (&get_array2() const)[3]
+	{
+		return _arr2;
+	}
+
+private:
+	std::string _str;
+	float _arr1[3];
+	float _arr2[3];
+};
+
 /**
  * Defines an interaction profile, as specified by 6.4 in the OpenXR spec.
  * Implementing an interaction profile is fairly straightforward, view the other interaction profiles for examples.
@@ -132,6 +164,8 @@ public:
 	 */
 	virtual glm::mat4 GetGripToSteamVRTransform(ITrackedDevice::HandType hand) const;
 
+	glm::mat4 CreateRotationMatrix(float xDegrees, float yDegrees, float zDegrees) const;
+
 	/**
 	 * Get the transform of a controller component relative to the SteamVR hand position (when
 	 * GetGripToSteamVRTransform has been accounted for).
@@ -179,9 +213,10 @@ protected:
 		const char *btnA = nullptr, *btnATouch = nullptr;
 
 		const char *stickX = nullptr, *stickY = nullptr, *stickBtn = nullptr, *stickBtnTouch = nullptr;
-		const char *trackPadX = nullptr, *trackPadY = nullptr, *trackPadClick;
+		const char *trackPadX = nullptr, *trackPadY = nullptr, *trackPadClick, *trackPadTouch = nullptr;
 		const char *trigger = nullptr, *triggerClick = nullptr, *triggerTouch = nullptr;
 		const char* grip = nullptr;
+		const char* gripClick = nullptr;
 
 		const char* haptic = nullptr;
 
@@ -226,6 +261,8 @@ protected:
 	 * Don't manually set 'handgrip' - instead, use GetComponentTransform.
 	 */
 	std::unordered_map<std::string, glm::mat4> leftComponentTransforms, rightComponentTransforms;
+
+	glm::mat4 ConvertTransform(CustomObject ctrlTransforms) const;
 
 	// Grip transforms for left and right hand
 	glm::mat4 leftHandGripTransform = glm::identity<glm::mat4>();

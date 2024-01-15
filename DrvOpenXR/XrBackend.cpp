@@ -46,6 +46,8 @@
 
 using namespace vr;
 
+static bool testOnlyOne = false;
+
 std::unique_ptr<TemporaryGraphics> XrBackend::temporaryGraphics = nullptr;
 XrBackend::XrBackend(bool useVulkanTmpGfx, bool useD3D11TmpGfx)
 {
@@ -737,8 +739,9 @@ bool XrBackend::IsInputAvailable()
 void XrBackend::PumpEvents()
 {
 	BaseInput* input = GetUnsafeBaseInput();
-	if (input && !input->AreActionsLoaded() && sessionState == XR_SESSION_STATE_FOCUSED && !hand_left && !hand_right) {
+	if (!testOnlyOne && input && !input->AreActionsLoaded() && sessionState == XR_SESSION_STATE_FOCUSED && !hand_left && !hand_right) {
 		QueryForInteractionProfile();
+		testOnlyOne = true;
 	}
 	// Poll for OpenXR events
 	// TODO filter by session?
@@ -749,7 +752,7 @@ void XrBackend::PumpEvents()
 
 		if (res == XR_EVENT_UNAVAILABLE) {
 			break;
-		}			
+		}
 
 		if (ev.type == XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED) {
 			auto* changed = (XrEventDataSessionStateChanged*)&ev;
@@ -955,8 +958,8 @@ void XrBackend::MaybeRestartForInputs()
 {
 	// if we haven't attached any actions to the session (infoSet or game actions), no need to restart
 	BaseInput* input = GetUnsafeBaseInput();
-	if (infoSet == XR_NULL_HANDLE && (!input || !input->AreActionsLoaded()))
-		return;
+	// if (infoSet == XR_NULL_HANDLE && (!input || !input->AreActionsLoaded()))
+	// return;
 
 	OOVR_LOG("Restarting session for inputs...");
 	DrvOpenXR::SetupSession();

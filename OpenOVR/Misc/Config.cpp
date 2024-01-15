@@ -186,13 +186,39 @@ int Config::ini_handler(void* user, const char* pSection,
 		CFGOPT(bool, enableInputSmoothing);
 		CFGOPT(int, inputWindowSize);
 		CFGOPT(bool, adjustTilt);
+		CFGOPT(bool, adjustLeftRotation);
+		CFGOPT(bool, adjustRightRotation);
+		CFGOPT(bool, adjustLeftPosition);
+		CFGOPT(bool, adjustRightPosition);
 		CFGOPT(float, tilt);
+		CFGOPT(float, leftXRotation);
+		CFGOPT(float, leftYRotation);
+		CFGOPT(float, leftZRotation);
+		CFGOPT(float, rightXRotation);
+		CFGOPT(float, rightYRotation);
+		CFGOPT(float, rightZRotation);
+		CFGOPT(float, leftXPosition);
+		CFGOPT(float, leftYPosition);
+		CFGOPT(float, leftZPosition);
+		CFGOPT(float, rightXPosition);
+		CFGOPT(float, rightYPosition);
+		CFGOPT(float, rightZPosition);
 		CFGOPT(float, leftDeadZoneSize);
+		CFGOPT(float, leftDeadZoneXSize);
+		CFGOPT(float, leftDeadZoneYSize);
 		CFGOPT(float, rightDeadZoneSize);
+		CFGOPT(float, rightDeadZoneXSize);
+		CFGOPT(float, rightDeadZoneYSize);
 		CFGOPT(bool, disableTriggerTouch);
 		CFGOPT(float, hapticStrength);
 		CFGOPT(bool, disableTrackPad);
+		CFGOPT(bool, enableControllerSmoothing);
+		CFGOPT(bool, enableVRIKKnucklesTrackPadSupport);
 		CFGOPT(string, keyboardText);
+		CFGOPT(float, posSmoothMinCutoff);
+		CFGOPT(float, rotSmoothMinCutoff);
+		CFGOPT(float, posSmoothBeta);
+		CFGOPT(float, rotSmoothBeta);
 	}
 
 #undef CFGOPT
@@ -249,6 +275,7 @@ Config::Config()
 	}
 
 	OOVR_LOG("Checking for global config file...");
+	OOVR_LOG("Version 1.9");
 	wstring file = dir + L"opencomposite.ini";
 	int err = wini_parse(file.c_str(), ini_handler, this);
 #else
@@ -272,7 +299,32 @@ Config::Config()
 	}
 
 	if (err == -1) {
-		// Couldn't open file, no problen since the config file is optional and
+		// Couldn't open file, no problem since the config file is optional and
+		//  the defaults are set up as the default values for the variables
+		return;
+	} else if (err) {
+		// err is the line number
+		string str = "Config error on line " + to_string(err);
+		ABORT(str);
+	}
+
+	if (err == -1 || err == 0) {
+		// No such file or it was parsed successfully, check the working directory
+		// for a file that overrides some properties
+		char buff[FILENAME_MAX];
+		GetCurrentDir(buff, FILENAME_MAX);
+		file = wstring(&buff[0], &buff[strlen(buff)]);
+#ifdef _WIN32
+		file += L"\\opencomposite_ext.ini";
+#else
+		file += L"/opencomposite_ext.ini";
+#endif
+		OOVR_LOG("Checking for app specific extended config file...");
+		err = wini_parse(file.c_str(), ini_handler, this);
+	}
+
+	if (err == -1) {
+		// Couldn't open file, no problem since the config file is optional and
 		//  the defaults are set up as the default values for the variables
 		return;
 	} else if (err) {
