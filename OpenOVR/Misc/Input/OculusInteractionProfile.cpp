@@ -125,22 +125,6 @@ OculusTouchInteractionProfile::OculusTouchInteractionProfile()
 	float rotationBaseRightNoRot[3] = { -20, 0.0, 0.0 };
 	CustomObject baseTransformRightNoRot("base_rightnorot", originBaseRightNoRot, rotationBaseRightNoRot);
 
-	float originBaseLeft[3] = { -0.00554, -0.00735, 0.139 };
-	float rotationBaseLeft[3] = { -0.4, -180.0, 0.0 };
-	CustomObject baseTransformLeft("base_left", originBaseLeft, rotationBaseLeft);
-
-	float originBaseRight[3] = { 0.00554, -0.00735, 0.139 };
-	float rotationBaseRight[3] = { -0.4, -180.0, 0.0 };
-	CustomObject baseTransformRight("base_right", originBaseRight, rotationBaseRight);
-
-	float originBaseLeftNoRot[3] = { -0.00554, 0.00635, 0.000 };
-	float rotationBaseLeftNoRot[3] = { -20, 0.0, 0.0 };
-	CustomObject baseTransformLeftNoRot("base_leftnorot", originBaseLeftNoRot, rotationBaseLeftNoRot);
-
-	float originBaseRightNoRot[3] = { 0.00554, 0.00635, 0.000 };
-	float rotationBaseRightNoRot[3] = { -20, 0.0, 0.0 };
-	CustomObject baseTransformRightNoRot("base_rightnorot", originBaseRightNoRot, rotationBaseRightNoRot);
-
 	float originBodyLeft[3] = { 0.0, 0.003, 0.097 };
 	float rotationBodyLeft[3] = { 5.037, 0.0, 0.0 };
 	CustomObject bodyTransformLeft("body_left", originBodyLeft, rotationBodyLeft);
