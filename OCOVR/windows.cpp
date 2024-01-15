@@ -107,7 +107,7 @@ void init_audio()
 	HRESULT hr = find_output_device(dev, oovr_global_configuration.AudioDeviceName());
 
 	if (SUCCEEDED(hr)) {
-		OOVR_LOGF("Succeeded in getting audio device output: %s.  Setting app default audio output to device.", dev);
+		OOVR_LOGF("Succeeded in getting audio device output: %s.  Setting app default audio output to device.", dev.c_str());
 		set_app_default_audio_device(dev);
 	} else {
 		OOVR_LOGF("Failed to get audio device output");
